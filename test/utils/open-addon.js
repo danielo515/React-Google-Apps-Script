@@ -59,9 +59,7 @@ export const openAddon = async (page) => {
   }
 
   await page
-    .locator(
-      'div.menu-button.goog-control.goog-inline-block:nth-child(10)'
-    )
+    .locator('div.menu-button.goog-control.goog-inline-block:nth-child(10)')
     .waitFor({ state: 'visible' });
 
   // open new addon menubar item
