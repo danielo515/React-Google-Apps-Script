@@ -9,8 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-14, windows-2022]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        os: [ubuntu-latest, macos-14]
         node-version: [20]
     timeout-minutes: 11
     steps:
@@ -25,23 +24,24 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install packages
         run: pnpm install
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
       - name: Allow running mkcert on Mac
         run: sudo security authorizationdb write com.apple.trust-settings.admin allow
         if: runner.os == 'macOS'
-      - name: Install mkcert
+      - name: Install mkcert (macOS)
         run: brew install mkcert
         if: runner.os == 'macOS'
+      - name: Install mkcert (Linux)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libnss3-tools
+          brew install mkcert || (curl -JLO "https://dl.filippo.io/mkcert/latest?for=linux/amd64" && chmod +x mkcert-v*-linux-amd64 && sudo mv mkcert-v*-linux-amd64 /usr/local/bin/mkcert)
+        if: runner.os == 'Linux'
       - name: Run mkcert setup [mkcert -install]
         run: mkcert -install
-        if: runner.os == 'macOS'
       - name: Install https cert [pnpm setup:https]
         run: pnpm setup:https
-        if: runner.os == 'macOS'
-      - run: |
-          mkdir certs
-          .\scripts\generate-cert.ps1
-        shell: pwsh
-        if: runner.os == 'Windows'
       - name: Add .clasprc.json to home folder
         run: echo "$DOT_CLASPRC" > $HOME/.clasprc.json
         shell: bash
@@ -75,7 +75,5 @@ jobs:
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
       - name: Run integration tests
-        # use ci-reporter to publish failing diff images to s3 bucket
-        # run: pnpm test:integration:extended:ci-reporter
         run: pnpm test:integration:extended
         shell: bash

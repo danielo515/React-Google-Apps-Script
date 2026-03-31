@@ -1,11 +1,12 @@
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { exec } from 'child_process';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { configureToMatchImageSnapshot } from 'jest-image-snapshot';
+import { chromium } from 'playwright';
 import dotenv from 'dotenv';
-import puppeteer from 'puppeteer';
 import { openAddon } from './utils/open-addon';
 
 dotenv.config();
@@ -30,10 +31,7 @@ const srcTestFile = path.join(
   '../src/client/dialog-demo-bootstrap/components/SheetEditor.jsx'
 );
 
-const DIR = path.join(
-  (await import('os')).tmpdir(),
-  'jest_puppeteer_global_setup'
-);
+const DIR = path.join(os.tmpdir(), 'playwright_global_setup');
 
 const viteDevServerReady = async (process) => {
   console.log('Waiting for vite to serve...');
@@ -58,16 +56,14 @@ describe(`Local setup ${isExtended ? '*extended*' : ''}`, () => {
       path.join(DIR, 'wsEndpoint'),
       'utf8'
     );
-    browser = await puppeteer.connect({ browserWSEndpoint: wsEndpoint });
+    browser = await chromium.connectOverCDP(wsEndpoint);
 
     process = exec('pnpm dev');
-    page = await browser.newPage();
-
-    await page.setViewport({
-      width: 800,
-      height: 800,
-      deviceScaleFactor: 1,
+    const context = browser.contexts()[0] || await browser.newContext({
+      viewport: { width: 800, height: 800 },
+      ignoreHTTPSErrors: true,
     });
+    page = await context.newPage();
 
     await viteDevServerReady(process);
 
@@ -81,13 +77,16 @@ describe(`Local setup ${isExtended ? '*extended*' : ''}`, () => {
     }
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     console.log('Closing process.');
+    if (browser) {
+      await browser.close();
+    }
     process.kill();
   });
 
   it('should load Bootstrap example', async () => {
-    const container = await page.$(containerSelector);
+    const container = await page.locator(containerSelector);
     const image = await container.screenshot();
     await expect(image).toMatchImageSnapshot();
   });
@@ -105,7 +104,7 @@ describe(`Local setup ${isExtended ? '*extended*' : ''}`, () => {
       );
     await fs.promises.writeFile(srcTestFile, result, 'utf8');
     await page.waitForTimeout(4000);
-    const container = await page.$(containerSelector);
+    const container = await page.locator(containerSelector);
     const image = await container.screenshot();
     await expect(image).toMatchImageSnapshot();
   });
@@ -123,7 +122,7 @@ describe(`Local setup ${isExtended ? '*extended*' : ''}`, () => {
       );
     await fs.promises.writeFile(srcTestFile, result, 'utf8');
     await page.waitForTimeout(4000);
-    const container = await page.$(containerSelector);
+    const container = await page.locator(containerSelector);
     const image = await container.screenshot();
     await expect(image).toMatchImageSnapshot();
   });

@@ -1,24 +1,27 @@
-// Custom Puppeteer setup for Vitest
+// Playwright global setup for Vitest
 // Launches a shared browser instance and exposes the wsEndpoint via filesystem
 
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import puppeteer from 'puppeteer-extra';
-
-// add stealth plugin and use defaults (all evasion techniques)
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-
-import jestPuppeteerConfig from './jest-puppeteer.config.js';
+import { chromium } from 'playwright';
 
 const fsPromises = fs.promises;
-const DIR = path.join(os.tmpdir(), 'jest_puppeteer_global_setup');
+const DIR = path.join(os.tmpdir(), 'playwright_global_setup');
 
 let browser;
 
 export async function setup() {
-  puppeteer.use(StealthPlugin());
-  browser = await puppeteer.launch(jestPuppeteerConfig.launch);
+  browser = await chromium.launch({
+    headless: false,
+    args: [
+      '--force-color-profile=generic-rgb',
+      '--font-render-hinting=none',
+      '--disable-font-subpixel-positioning',
+      '--enable-font-antialiasing',
+      '--disable-gpu',
+    ],
+  });
 
   // use the file system to expose the wsEndpoint for test files
   await fsPromises.mkdir(DIR, { recursive: true });
