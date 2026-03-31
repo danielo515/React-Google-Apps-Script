@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-13, windows-2022]
+        os: [macos-latest, windows-2022]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
         node-version: [20]
     timeout-minutes: 8
@@ -18,7 +18,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 10
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
@@ -27,16 +27,16 @@ jobs:
         run: pnpm install
       - name: Allow running mkcert on Mac
         run: sudo security authorizationdb write com.apple.trust-settings.admin allow
-        if: runner.os == 'MacOS'
+        if: runner.os == 'macOS'
       - name: Install mkcert
         run: brew install mkcert
-        if: runner.os == 'MacOS'
+        if: runner.os == 'macOS'
       - name: Run mkcert setup [mkcert -install]
         run: mkcert -install
-        if: runner.os == 'MacOS'
+        if: runner.os == 'macOS'
       - name: Install https cert [pnpm setup:https]
         run: pnpm setup:https
-        if: runner.os == 'MacOS'
+        if: runner.os == 'macOS'
       - run: |
           mkdir certs
           .\scripts\generate-cert.ps1
