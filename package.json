@@ -51,6 +51,7 @@
   "devDependencies": {
     "@google/clasp": "^2.4.2",
     "@types/node": "^20.11.30",
+    "@types/prop-types": "^15.7.15",
     "@types/puppeteer": "^5.4.6",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",

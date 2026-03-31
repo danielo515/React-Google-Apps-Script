@@ -42,6 +42,9 @@ importers:
       '@types/node':
         specifier: ^20.11.30
         version: 20.19.37
+      '@types/prop-types':
+        specifier: ^15.7.15
+        version: 15.7.15
       '@types/puppeteer':
         specifier: ^5.4.6
         version: 5.4.7
