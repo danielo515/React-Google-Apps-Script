@@ -56,15 +56,13 @@ describe(`Local setup ${isExtended ? '*extended*' : ''}`, () => {
       path.join(DIR, 'wsEndpoint'),
       'utf8'
     );
-    browser = await chromium.connectOverCDP(wsEndpoint);
+    browser = await chromium.connect(wsEndpoint);
 
     process = exec('pnpm dev');
-    const context =
-      browser.contexts()[0] ||
-      (await browser.newContext({
-        viewport: { width: 800, height: 800 },
-        ignoreHTTPSErrors: true,
-      }));
+    const context = await browser.newContext({
+      viewport: { width: 800, height: 800 },
+      ignoreHTTPSErrors: true,
+    });
     page = await context.newPage();
 
     await viteDevServerReady(process);
