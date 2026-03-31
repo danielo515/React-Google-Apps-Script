@@ -1,5 +1,5 @@
 // Playwright global setup for Vitest
-// Launches a shared browser instance and exposes the wsEndpoint via filesystem
+// Launches a shared browser server and exposes the wsEndpoint via filesystem
 
 import fs from 'fs';
 import os from 'os';
@@ -9,11 +9,10 @@ import { chromium } from 'playwright';
 const fsPromises = fs.promises;
 const DIR = path.join(os.tmpdir(), 'playwright_global_setup');
 
-let browser;
+let browserServer;
 
 export async function setup() {
-  browser = await chromium.launch({
-    headless: false,
+  browserServer = await chromium.launchServer({
     args: [
       '--force-color-profile=generic-rgb',
       '--font-render-hinting=none',
@@ -27,13 +26,13 @@ export async function setup() {
   await fsPromises.mkdir(DIR, { recursive: true });
   await fsPromises.writeFile(
     path.join(DIR, 'wsEndpoint'),
-    browser.wsEndpoint()
+    browserServer.wsEndpoint()
   );
 }
 
 export async function teardown() {
-  if (browser) {
-    await browser.close();
+  if (browserServer) {
+    await browserServer.close();
   }
 
   // clean-up the wsEndpoint file
