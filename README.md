@@ -65,7 +65,9 @@ See [deploy](#deploy) for notes on how to deploy the project and see it live in 
 
 ### Prerequisites <a name = "prerequisites"></a>
 
-- Make sure you're running at least [Node.js](https://nodejs.org/en/download/) v18.
+- Make sure you're running at least [Node.js](https://nodejs.org/en/download/) v18 and [pnpm](https://pnpm.io/installation).
+
+- **Recommended:** This project includes a `flake.nix` file. If you use [Nix](https://nixos.org/) with [direnv](https://direnv.net/), all required tools (Node.js, pnpm, git) are automatically available when you enter the project directory — no manual installation needed.
 
 - You'll need to enable the Google Apps Script API. You can do that by visiting [script.google.com/home/usersettings](https://script.google.com/home/usersettings).
 
@@ -82,19 +84,19 @@ Full steps to getting your local environment set up, deploying your app, and als
 ```bash
 git clone https://github.com/enuchi/React-Google-Apps-Script.git
 cd React-Google-Apps-Script
-yarn install
+pnpm install
 ```
 
 **2.** Next, we'll need to log in to [clasp](https://github.com/google/clasp), which lets us manage our Google Apps Script projects locally.
 
 ```bash
-yarn run login
+pnpm run login
 ```
 
 **3.** Now let's run the setup script to create a New spreadsheet and script project from the command line.
 
 ```bash
-yarn run setup
+pnpm run setup
 ```
 
 Alternatively, you can use an existing Google Spreadsheet and Script file instead of creating a new one.
@@ -131,12 +133,12 @@ Next, let's deploy the app so we can see it live in Google Spreadsheets.
 Run the deploy command. You may be prompted to update your manifest file. Type 'yes'.
 
 ```bash
-yarn run deploy
+pnpm run deploy
 ```
 
 The deploy command will build all necessary files using production settings, including all server code (Google Apps Script code), client code (React bundle), and config files. All bundled files will be outputted to the `dist/` folder, then pushed to the Google Apps Script project.
 
-Now open Google Sheets and navigate to your new spreadsheet (e.g. the file "My React Project"). You can also run `yarn run open`. Make sure to refresh the page if you already had it open. You will now see a new menu item appear containing your app!
+Now open Google Sheets and navigate to your new spreadsheet (e.g. the file "My React Project"). You can also run `pnpm run open`. Make sure to refresh the page if you already had it open. You will now see a new menu item appear containing your app!
 
 <br/>
 
@@ -169,13 +171,13 @@ There are two steps to getting started: installing a certificate (first time onl
    Create the certs in your repo:
 
    ```
-   yarn run setup:https
+   pnpm run setup:https
    ```
 
 2. Now you're ready to start:
 
    ```bash
-   yarn run start
+   pnpm run start
    ```
 
 The start command will create and deploy a development build, and serve your local files.
@@ -200,14 +202,14 @@ You will need to use the "standalone" version of React DevTools since our React 
 1. In your repo install the React DevTools package as a dev dependency:
 
    ```bash
-   yarn add -D react-devtools
+   pnpm add -D react-devtools
    ```
 
 2. In a new terminal window run `npx react-devtools` to launch the DevTools standalone app.
 
 3. Add `<script src="http://localhost:8097"></script>` to the top of your `<head>` in your React app, e.g. in the [index.html](https://github.com/enuchi/React-Google-Apps-Script/blob/e73e51e56e99903885ef8dd5525986f99038d8bf/src/client/dialog-demo-bootstrap/index.html) file in the sample Bootstrap app.
 
-4. Deploy your app (`yarn run deploy:dev`) and you should see DevTools tool running and displaying your app hierarchy.
+4. Deploy your app (`pnpm run deploy:dev`) and you should see DevTools tool running and displaying your app hierarchy.
 
    <img width="100%" src="https://user-images.githubusercontent.com/31550519/110273600-ee9eae80-7f9a-11eb-9796-31353b47dfa8.gif">
 
@@ -238,7 +240,7 @@ Note that if you are choosing to use one framework, for example `Tailwind`, for 
 <details>
   <summary>Here are some steps to take to clean up the repo if you are only using a single library</summary>
 
-1. Uninstall unneeded dependencies (`yarn remove react-bootstrap ...` etc.)
+1. Uninstall unneeded dependencies (`pnpm remove react-bootstrap ...` etc.)
 
 2. Remove the unneeded menu bar items from the server code.
 
@@ -271,7 +273,7 @@ You can add packages to your client-side React app.
 For instance, install `react-transition-group`:
 
 ```bash
-yarn add react-transition-group
+pnpm add react-transition-group
 ```
 
 Important: Since Google Apps Scripts projects don't let you easily reference external files, this project will bundle an entire app into one HTML file. If you are importing large libraries this can result in a large file. To help reduce the size of these large HTML files, you can try to externalize packages by using a CDN to load packages. For packages that can be loaded through a CDN (usually they will have a UMD build), you can configure the externals and globals details in the [vite config file](./vite.config.ts). You will also need to include a script element in the head of the `index.html` file, loading the library from a CDN, and making sure it supports a UMD build, e.g.
@@ -279,7 +281,7 @@ Important: Since Google Apps Scripts projects don't let you easily reference ext
 
 If set up properly, this will load packages from the CDN in production and will reduce your overall bundle size.
 
-Make sure that you update the script tag with the same version of the package you are installing with yarn, so that you are using the same version in development and production.
+Make sure that you update the script tag with the same version of the package you are installing with pnpm, so that you are using the same version in development and production.
 
 ### Styles
 
