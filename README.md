@@ -29,14 +29,14 @@
 - [Deploy](#deploy)
 - [Local Development](#local-development)
   - [Using React DevTools](#dev-tools)
-- [Usage](#usage)
+- [Usage](#Usage)
   - [The included sample app](#the-included-sample-app)
   - [Typescript](#new-typescript)
   - [Adding packages](#adding-packages)
   - [Styles](#styles)
   - [Modifying scopes](#modifying-scopes)
   - [Calling server-side Google Apps Script functions](#calling-server-side-google-apps-script-functions)
-  - [Autocomplete](#Autocomplete)
+  - [Autocomplete](#autocomplete)
 - [Authors](#authors)
 - [Acknowledgments](#acknowledgement)
 
@@ -65,7 +65,7 @@ See [deploy](#deploy) for notes on how to deploy the project and see it live in 
 
 ### Prerequisites <a name = "prerequisites"></a>
 
-- Make sure you're running at least [Node.js](https://nodejs.org/en/download/) v18 and [yarn (classic)](https://classic.yarnpkg.com/lang/en/docs/install/).
+- Make sure you're running at least [Node.js](https://nodejs.org/en/download/) v18.
 
 - You'll need to enable the Google Apps Script API. You can do that by visiting [script.google.com/home/usersettings](https://script.google.com/home/usersettings).
 
@@ -75,8 +75,7 @@ See [deploy](#deploy) for notes on how to deploy the project and see it live in 
 
 Full steps to getting your local environment set up, deploying your app, and also running your app locally for local development are shown in the video below:
 
-https://github.com/enuchi/React-Google-Apps-Script/assets/31550519/83622b83-0d0e-43de-a589-36f96d51c9c4
-
+<https://github.com/enuchi/React-Google-Apps-Script/assets/31550519/83622b83-0d0e-43de-a589-36f96d51c9c4>
 
 **1.** First, let's clone the repo and install the dependencies. This project is published as a public template, so you can also fork the repo or select "Use this template" in GitHub.
 
@@ -86,12 +85,12 @@ cd React-Google-Apps-Script
 yarn install
 ```
 
-
 **2.** Next, we'll need to log in to [clasp](https://github.com/google/clasp), which lets us manage our Google Apps Script projects locally.
 
 ```bash
 yarn run login
 ```
+
 **3.** Now let's run the setup script to create a New spreadsheet and script project from the command line.
 
 ```bash
@@ -123,7 +122,7 @@ You will need to update the `.clasp.json` file in the root of this project with 
 
 Next, let's deploy the app so we can see it live in Google Spreadsheets.
 
-https://github.com/enuchi/React-Google-Apps-Script/assets/31550519/0c67c4b8-e3f5-4345-8460-470e9211aeb9
+<https://github.com/enuchi/React-Google-Apps-Script/assets/31550519/0c67c4b8-e3f5-4345-8460-470e9211aeb9>
 
 <br/>
 
@@ -174,6 +173,7 @@ There are two steps to getting started: installing a certificate (first time onl
    ```
 
 2. Now you're ready to start:
+
    ```bash
    yarn run start
    ```
@@ -182,7 +182,7 @@ The start command will create and deploy a development build, and serve your loc
 
 After running the start command, navigate to your spreadsheet and open one of the menu items. It should now be serving your local files. When you make and save changes to your React app, your app will reload instantly within the Google Spreadsheet, and have access to any server-side functions!
 
-https://github.com/enuchi/React-Google-Apps-Script/assets/31550519/981604ac-bdea-489d-97fa-72e6d24ba6dd
+<https://github.com/enuchi/React-Google-Apps-Script/assets/31550519/981604ac-bdea-489d-97fa-72e6d24ba6dd>
 
 <br/>
 
@@ -295,7 +295,7 @@ Many external component libraries require a css stylesheet in order to work prop
 
 The included app only requires access to Google Spreadsheets and to loading dialog windows. If you make changes to the app's requirements, for instance, if you modify this project to work with Google Forms or Docs, make sure to edit the oauthScopes in the [appscript.json file](./appsscript.json).
 
-See https://developers.google.com/apps-script/manifest for information on the `appsscript.json` structure.
+See <https://developers.google.com/apps-script/manifest> for information on the `appsscript.json` structure.
 
 ### Calling server-side Google Apps Script functions
 

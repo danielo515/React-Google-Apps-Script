@@ -1,13 +1,55 @@
 {
-  "json.schemas": [{
-      "fileMatch": [
-          "appsscript.json"
-      ],
+  "json.schemas": [
+    {
+      "fileMatch": ["appsscript.json"],
       "url": "http://json.schemastore.org/appsscript"
-  }, {
-      "fileMatch": [
-          ".clasp.json"
-      ],
+    },
+    {
+      "fileMatch": [".clasp.json"],
       "url": "http://json.schemastore.org/clasp"
-  }]
+    }
+  ],
+  "nixEnvSelector.nixFile": "${workspaceFolder}/flake.nix",
+  "workbench.colorCustomizations": {
+    "terminal.border": "#ff0000",
+    "gitDecoration.modifiedResourceForeground": "#ff39ff",
+    "gitDecoration.untrackedResourceForeground": "#d5ffd9",
+    "editor.findMatchBackground": "#aFF0F0F9",
+    "editor.compositionBorder": "#ff0000",
+    "window.activeBorder": "#ff0000",
+    "tab.activeBackground": "#ffe3b359",
+    "editor.findMatchBorder": "#ff0000",
+    "editor.hoverHighlightBackground": "#fff9a744",
+    "editorIndentGuide.background1": "#ffb86c60",
+    "editor.inactiveSelectionBackground": "#b0ffb384",
+    "editor.findMatchHighlightBackground": "#ff00ff53",
+    "editor.selectionBackground": "#ff0000e6",
+    "editor.selectionHighlightBackground": "#4a6cf391",
+    "editorIndentGuide.background2": "#ff75b541",
+    "editorIndentGuide.background3": "#45a8f949",
+    "editorIndentGuide.background4": "#b184eb26",
+    "editorIndentGuide.background5": "#e6e6e62e",
+    "editorIndentGuide.background6": "#19f9d736",
+    "editorIndentGuide.activeBackground1": "#ffb86cac",
+    "editorIndentGuide.activeBackground2": "#ff75b5ce",
+    "editorIndentGuide.activeBackground3": "#45a8f9be",
+    "editorIndentGuide.activeBackground4": "#b184ebd4",
+    "editorIndentGuide.activeBackground5": "#e6e6e6cf",
+    "editorIndentGuide.activeBackground6": "#19f9d7d7",
+    "glaze.active": "Catppuccin Latte",
+    "[Catppuccin Latte]": {
+      "titleBar.activeBackground": "#a5cec2",
+      "titleBar.activeForeground": "#2e3040",
+      "titleBar.inactiveBackground": "#afd4c9",
+      "titleBar.inactiveForeground": "#3f434e",
+      "titleBar.border": "#63a18a",
+      "statusBar.background": "#9ec6bb",
+      "statusBar.foreground": "#2e3040",
+      "statusBar.border": "#56967f",
+      "activityBar.background": "#aedacc",
+      "activityBar.foreground": "#542596",
+      "activityBar.activeBackground": "#74b19a",
+      "activityBar.activeBorder": "#74b19a"
+    }
+  }
 }
