@@ -1,31 +1,40 @@
-// Use custom jest puppeteer preset as described here:
-// jestjs.io/docs/puppeteer#custom-example-without-jest-puppeteer-preset
-// This allows using stealth mode.
+// Playwright global setup for Vitest
+// Launches a shared browser server and exposes the wsEndpoint via filesystem
 
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import puppeteer from 'puppeteer-extra';
-
-// add stealth plugin and use defaults (all evasion techniques)
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-
-import jestPuppeteerConfig from './jest-puppeteer.config.js';
+import { chromium } from 'playwright';
 
 const fsPromises = fs.promises;
-const DIR = path.join(os.tmpdir(), 'jest_puppeteer_global_setup');
+const DIR = path.join(os.tmpdir(), 'playwright_global_setup');
 
-export default async function globalSetup() {
-  puppeteer.use(StealthPlugin());
-  const browser = await puppeteer.launch(jestPuppeteerConfig.launch);
-  // store the browser instance so we can teardown it later
-  // this global is only available in the teardown but not in TestEnvironments
-  global.__BROWSER_GLOBAL__ = browser;
+let browserServer;
 
-  // use the file system to expose the wsEndpoint for TestEnvironments
+export async function setup() {
+  browserServer = await chromium.launchServer({
+    args: [
+      '--force-color-profile=generic-rgb',
+      '--font-render-hinting=none',
+      '--disable-font-subpixel-positioning',
+      '--enable-font-antialiasing',
+      '--disable-gpu',
+    ],
+  });
+
+  // use the file system to expose the wsEndpoint for test files
   await fsPromises.mkdir(DIR, { recursive: true });
   await fsPromises.writeFile(
     path.join(DIR, 'wsEndpoint'),
-    browser.wsEndpoint()
+    browserServer.wsEndpoint()
   );
+}
+
+export async function teardown() {
+  if (browserServer) {
+    await browserServer.close();
+  }
+
+  // clean-up the wsEndpoint file
+  await fsPromises.rm(DIR, { recursive: true, force: true });
 }

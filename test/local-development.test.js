@@ -1,11 +1,17 @@
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { exec } from 'child_process';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { configureToMatchImageSnapshot } from 'jest-image-snapshot';
+import { chromium } from 'playwright';
 import dotenv from 'dotenv';
 import { openAddon } from './utils/open-addon';
 
 dotenv.config();
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const isExtended = `${process.env.IS_EXTENDED}` === 'true';
 
@@ -19,12 +25,13 @@ const toMatchImageSnapshot = configureToMatchImageSnapshot({
   allowSizeMismatch: true,
 });
 expect.extend({ toMatchImageSnapshot });
-jest.setTimeout(180000);
 
 const srcTestFile = path.join(
   __dirname,
   '../src/client/dialog-demo-bootstrap/components/SheetEditor.jsx'
 );
+
+const DIR = path.join(os.tmpdir(), 'playwright_global_setup');
 
 const viteDevServerReady = async (process) => {
   console.log('Waiting for vite to serve...');
@@ -40,17 +47,23 @@ const viteDevServerReady = async (process) => {
 describe(`Local setup ${isExtended ? '*extended*' : ''}`, () => {
   let page;
   let process;
+  let browser;
   const containerSelector = isExtended ? 'div[role="dialog"]' : 'body';
 
   beforeAll(async () => {
-    process = exec('yarn dev');
-    page = await global.__BROWSER_GLOBAL__.newPage();
+    // Connect to the browser launched by globalSetup
+    const wsEndpoint = await fs.promises.readFile(
+      path.join(DIR, 'wsEndpoint'),
+      'utf8'
+    );
+    browser = await chromium.connect(wsEndpoint);
 
-    await page.setViewport({
-      width: 800,
-      height: 800,
-      deviceScaleFactor: 1,
+    process = exec('pnpm dev');
+    const context = await browser.newContext({
+      viewport: { width: 800, height: 800 },
+      ignoreHTTPSErrors: true,
     });
+    page = await context.newPage();
 
     await viteDevServerReady(process);
 
@@ -64,13 +77,16 @@ describe(`Local setup ${isExtended ? '*extended*' : ''}`, () => {
     }
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     console.log('Closing process.');
+    if (browser) {
+      await browser.close();
+    }
     process.kill();
   });
 
   it('should load Bootstrap example', async () => {
-    const container = await page.$(containerSelector);
+    const container = await page.locator(containerSelector);
     const image = await container.screenshot();
     await expect(image).toMatchImageSnapshot();
   });
@@ -88,7 +104,7 @@ describe(`Local setup ${isExtended ? '*extended*' : ''}`, () => {
       );
     await fs.promises.writeFile(srcTestFile, result, 'utf8');
     await page.waitForTimeout(4000);
-    const container = await page.$(containerSelector);
+    const container = await page.locator(containerSelector);
     const image = await container.screenshot();
     await expect(image).toMatchImageSnapshot();
   });
@@ -106,7 +122,7 @@ describe(`Local setup ${isExtended ? '*extended*' : ''}`, () => {
       );
     await fs.promises.writeFile(srcTestFile, result, 'utf8');
     await page.waitForTimeout(4000);
-    const container = await page.$(containerSelector);
+    const container = await page.locator(containerSelector);
     const image = await container.screenshot();
     await expect(image).toMatchImageSnapshot();
   });

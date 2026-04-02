@@ -9,35 +9,39 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-13, windows-2022]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        os: [ubuntu-latest, macos-14]
         node-version: [20]
     timeout-minutes: 11
     steps:
       - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install packages
-        run: yarn install
+        run: pnpm install
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
       - name: Allow running mkcert on Mac
         run: sudo security authorizationdb write com.apple.trust-settings.admin allow
-        if: runner.os == 'MacOS'
-      - name: Install mkcert
+        if: runner.os == 'macOS'
+      - name: Install mkcert (macOS)
         run: brew install mkcert
-        if: runner.os == 'MacOS'
+        if: runner.os == 'macOS'
+      - name: Install mkcert (Linux)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libnss3-tools
+          brew install mkcert || (curl -JLO "https://dl.filippo.io/mkcert/latest?for=linux/amd64" && chmod +x mkcert-v*-linux-amd64 && sudo mv mkcert-v*-linux-amd64 /usr/local/bin/mkcert)
+        if: runner.os == 'Linux'
       - name: Run mkcert setup [mkcert -install]
         run: mkcert -install
-        if: runner.os == 'MacOS'
-      - name: Install https cert [yarn setup:https]
-        run: yarn setup:https
-        if: runner.os == 'MacOS'
-      - run: |
-          mkdir certs
-          .\scripts\generate-cert.ps1
-        shell: pwsh
-        if: runner.os == 'Windows'
+      - name: Install https cert [pnpm setup:https]
+        run: pnpm setup:https
       - name: Add .clasprc.json to home folder
         run: echo "$DOT_CLASPRC" > $HOME/.clasprc.json
         shell: bash
@@ -66,12 +70,10 @@ jobs:
           S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      - name: Build and deploy dev setup [yarn deploy:dev]
-        run: yarn deploy:dev
+      - name: Build and deploy dev setup [pnpm deploy:dev]
+        run: pnpm run deploy:dev
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
       - name: Run integration tests
-        # use ci-reporter to publish failing diff images to s3 bucket
-        # run: yarn test:integration:extended:ci-reporter
-        run: yarn test:integration:extended
+        run: pnpm test:integration:extended
         shell: bash

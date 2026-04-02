@@ -1,57 +1,56 @@
 export const openAddon = async (page) => {
   await page.goto(process.env.SHEET_URL);
 
-  await page.waitForTimeout(5000); // pause for 3 seconds
-  await page.click('a:nth-child(2)'); // click on signin button
+  await page.waitForTimeout(5000);
+  await page.locator('a:nth-child(2)').click(); // click on signin button
 
-  await page.waitForSelector('input[name="identifier"]', { visible: true });
-  await page.type('input[name="identifier"]', process.env.EMAIL); // type email
-  await page.click('#identifierNext'); // click "next" button
+  await page.locator('input[name="identifier"]').waitFor({ state: 'visible' });
+  await page.locator('input[name="identifier"]').fill(process.env.EMAIL);
+  await page.locator('#identifierNext').click();
 
-  await page.waitForSelector('input[name="Passwd"]', { visible: true });
-  await page.type('input[name="Passwd"]', process.env.PASSWORD); // type pass
+  await page.locator('input[name="Passwd"]').waitFor({ state: 'visible' });
+  await page.locator('input[name="Passwd"]').fill(process.env.PASSWORD);
   await page.waitForTimeout(500);
 
-  await page.click('#passwordNext'); // click "next" button
+  await page.locator('#passwordNext').click();
   await page.waitForTimeout(3000);
 
-  if (
-    await page.evaluate(
-      () =>
-        document.querySelector('h1#headingText') &&
-        document.querySelector('h1#headingText').innerText.includes('erify')
-    )
-  ) {
+  const headingText = await page.evaluate(
+    () =>
+      document.querySelector('h1#headingText') &&
+      document.querySelector('h1#headingText').innerText
+  );
+
+  if (headingText && headingText.includes('erify')) {
     try {
-      await page.click('li:nth-child(3)');
+      await page.locator('li:nth-child(3)').click();
       await page.waitForTimeout(6000);
     } catch {
       // eslint-disable-next-line no-console
       console.log('The "choose account recovery method" page isn\'t shown');
     }
 
-    await page.type(
-      'input[name="knowledgePreregisteredEmailResponse"]',
-      process.env.TEST_RECOVERY_EMAIL
-    ); // type recovery email
+    await page
+      .locator('input[name="knowledgePreregisteredEmailResponse"]')
+      .fill(process.env.TEST_RECOVERY_EMAIL);
     await page.waitForTimeout(6000);
-    await page.click('div[data-primary-action-label] button'); // click "next" button
+    await page.locator('div[data-primary-action-label] button').click();
     await page.waitForTimeout(5000);
   }
 
-  if (
-    await page.evaluate(
-      () =>
-        document.querySelector('h1#headingText') &&
-        document
-          .querySelector('h1#headingText')
-          .innerText.includes('implify your sign')
-    )
-  ) {
+  const simplifyText = await page.evaluate(
+    () =>
+      document.querySelector('h1#headingText') &&
+      document.querySelector('h1#headingText').innerText
+  );
+
+  if (simplifyText && simplifyText.includes('implify your sign')) {
     try {
-      await page.click(
-        'div[data-secondary-action-label] > div > div:nth-child(2) button'
-      );
+      await page
+        .locator(
+          'div[data-secondary-action-label] > div > div:nth-child(2) button'
+        )
+        .click();
       await page.waitForTimeout(6000);
     } catch {
       // eslint-disable-next-line no-console
@@ -59,10 +58,9 @@ export const openAddon = async (page) => {
     }
   }
 
-  await page.waitForSelector(
-    'div.menu-button.goog-control.goog-inline-block:nth-child(10)',
-    { visible: true }
-  );
+  await page
+    .locator('div.menu-button.goog-control.goog-inline-block:nth-child(10)')
+    .waitFor({ state: 'visible' });
 
   // open new addon menubar item
   await page.evaluate(() => {
@@ -75,10 +73,11 @@ export const openAddon = async (page) => {
     addOnMenuButton.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
   });
 
-  await page.waitForSelector(
-    'div.goog-menu.goog-menu-vertical.apps-menu-hide-mnemonics:last-child > div:nth-child(2) > div',
-    { visible: true }
-  );
+  await page
+    .locator(
+      'div.goog-menu.goog-menu-vertical.apps-menu-hide-mnemonics:last-child > div:nth-child(2) > div'
+    )
+    .waitFor({ state: 'visible' });
 
   // open "bootstrap" menu item
   await page.evaluate(() => {
@@ -98,8 +97,8 @@ export const openAddon = async (page) => {
       new MouseEvent('mouseup', { bubbles: true })
     );
   });
-  await page.waitForSelector('div[role="dialog"]', {
-    visible: true,
+  await page.locator('div[role="dialog"]').waitFor({
+    state: 'visible',
     timeout: 10000,
   });
 
